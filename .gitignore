@@ -1,0 +1,6 @@
+/.quarto/
+*.csv
+*.docx
+.Rproj.user
+.Rhistory
+*.qmd

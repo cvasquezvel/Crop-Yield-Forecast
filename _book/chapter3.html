@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Crop Yield Forecast in tidymodels - 4&nbsp; Revisión de muchos modelos y Ensamblado de modelos en tidymodels.</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./chapter2.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Revisión de muchos modelos y Ensamblado de modelos en tidymodels.</span></h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Crop Yield Forecast in tidymodels</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle sidebar-tool" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Prefacio</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introducción</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapter1.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Modelamiento en tidymodels con el motor lm.</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapter2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelamiento en tidymodels con el motor ranger.</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapter3.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Revisión de muchos modelos y Ensamblado de modelos en tidymodels.</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#modelamiento-del-rendimiento-del-arándano-silvestre." id="toc-modelamiento-del-rendimiento-del-arándano-silvestre." class="nav-link active" data-scroll-target="#modelamiento-del-rendimiento-del-arándano-silvestre."> <span class="header-section-number">4.1</span> Modelamiento del rendimiento del arándano silvestre.</a>
+  <ul class="collapse">
+  <li><a href="#recetas-de-preprocesamiento" id="toc-recetas-de-preprocesamiento" class="nav-link" data-scroll-target="#recetas-de-preprocesamiento"> <span class="header-section-number">4.1.1</span> Recetas de preprocesamiento</a></li>
+  <li><a href="#especificación-de-los-modelos" id="toc-especificación-de-los-modelos" class="nav-link" data-scroll-target="#especificación-de-los-modelos"> <span class="header-section-number">4.1.2</span> Especificación de los modelos</a></li>
+  <li><a href="#extraer-el-conjunto-de-hiperparámetros-de-la-red-neuronal-monocapa" id="toc-extraer-el-conjunto-de-hiperparámetros-de-la-red-neuronal-monocapa" class="nav-link" data-scroll-target="#extraer-el-conjunto-de-hiperparámetros-de-la-red-neuronal-monocapa"> <span class="header-section-number">4.1.3</span> Extraer el conjunto de hiperparámetros de la red neuronal monocapa</a></li>
+  <li><a href="#creación-del-conjunto-de-flujos-de-trabajo" id="toc-creación-del-conjunto-de-flujos-de-trabajo" class="nav-link" data-scroll-target="#creación-del-conjunto-de-flujos-de-trabajo"> <span class="header-section-number">4.1.4</span> Creación del conjunto de flujos de trabajo</a></li>
+  <li><a href="#ajuste-y-evaluación-de-los-modelos" id="toc-ajuste-y-evaluación-de-los-modelos" class="nav-link" data-scroll-target="#ajuste-y-evaluación-de-los-modelos"> <span class="header-section-number">4.1.5</span> Ajuste y evaluación de los modelos</a></li>
+  <li><a href="#selección-eficaz-de-los-modelos" id="toc-selección-eficaz-de-los-modelos" class="nav-link" data-scroll-target="#selección-eficaz-de-los-modelos"> <span class="header-section-number">4.1.6</span> Selección eficaz de los modelos</a></li>
+  <li><a href="#finalizar-un-modelo" id="toc-finalizar-un-modelo" class="nav-link" data-scroll-target="#finalizar-un-modelo"> <span class="header-section-number">4.1.7</span> Finalizar un modelo</a></li>
+  <li><a href="#creación-del-conjunto-de-entrenamiento-para-el-apilamiento" id="toc-creación-del-conjunto-de-entrenamiento-para-el-apilamiento" class="nav-link" data-scroll-target="#creación-del-conjunto-de-entrenamiento-para-el-apilamiento"> <span class="header-section-number">4.1.8</span> Creación del conjunto de entrenamiento para el apilamiento</a></li>
+  <li><a href="#mezclar-las-predicciones" id="toc-mezclar-las-predicciones" class="nav-link" data-scroll-target="#mezclar-las-predicciones"> <span class="header-section-number">4.1.9</span> Mezclar las predicciones</a></li>
+  <li><a href="#ajustar-los-modelos-de-los-miembros" id="toc-ajustar-los-modelos-de-los-miembros" class="nav-link" data-scroll-target="#ajustar-los-modelos-de-los-miembros"> <span class="header-section-number">4.1.10</span> Ajustar los modelos de los miembros</a></li>
+  <li><a href="#resultados-del-conjunto-de-pruebas" id="toc-resultados-del-conjunto-de-pruebas" class="nav-link" data-scroll-target="#resultados-del-conjunto-de-pruebas"> <span class="header-section-number">4.1.11</span> Resultados del conjunto de pruebas</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Revisión de muchos modelos y Ensamblado de modelos en tidymodels.</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<p><strong>Caso: Plant spatial traits, bee species composition, and weather conditions dataset for wild blueberry yield prediction through computer simulation modeling and machine learning algorithms (Obsie &amp; Drummond, 2020)</strong></p>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<section id="modelamiento-del-rendimiento-del-arándano-silvestre." class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="modelamiento-del-rendimiento-del-arándano-silvestre."><span class="header-section-number">4.1</span> Modelamiento del rendimiento del arándano silvestre.</h2>
+<p>En este caso, solo trabajaré con las tres variables más importantes que se han hallado en el Modelamiento en tidymodels con el motor ranger.</p>
+<section id="recetas-de-preprocesamiento" class="level3" data-number="4.1.1">
+<h3 data-number="4.1.1" class="anchored" data-anchor-id="recetas-de-preprocesamiento"><span class="header-section-number">4.1.1</span> Recetas de preprocesamiento</h3>
+<p>Para evitar errores, las recetas de preprocesamiento no deben de incluir pasos de selección de variables.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Recipe ----</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>data_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="at">formula =</span> <span class="st">`</span><span class="at">yield</span><span class="st">`</span> <span class="sc">~</span> .,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">x =</span> data_train) <span class="sc">%&gt;%</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_mutate_at</span>(<span class="fu">where</span>(base<span class="sc">::</span>is.numeric),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>                 <span class="sc">-</span><span class="fu">contains</span>(<span class="fu">c</span>(<span class="st">"yield"</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"fruitset"</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"fruitmass"</span>)),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fn =</span> <span class="sc">~</span><span class="fu">log</span>(.))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>normalized_rec <span class="ot">&lt;-</span> </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>   data_rec <span class="sc">%&gt;%</span> </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>   <span class="fu">step_normalize</span>(<span class="fu">all_predictors</span>()) </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>poly_recipe <span class="ot">&lt;-</span> </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>   normalized_rec <span class="sc">%&gt;%</span> </span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>   <span class="fu">step_poly</span>(<span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>   <span class="fu">step_interact</span>(<span class="sc">~</span> <span class="fu">all_predictors</span>()<span class="sc">:</span><span class="fu">all_predictors</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="especificación-de-los-modelos" class="level3" data-number="4.1.2">
+<h3 data-number="4.1.2" class="anchored" data-anchor-id="especificación-de-los-modelos"><span class="header-section-number">4.1.2</span> Especificación de los modelos</h3>
+<p>En este paso, especificamos todos los modelos a probar.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>linear_reg_spec <span class="ot">&lt;-</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">linear_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_engine</span>(<span class="st">"glmnet"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>nnet_spec <span class="ot">&lt;-</span> </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>   <span class="fu">mlp</span>(<span class="at">hidden_units =</span> <span class="fu">tune</span>(), <span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">epochs =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_engine</span>(<span class="st">"nnet"</span>, <span class="at">MaxNWts =</span> <span class="dv">2600</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>mars_spec <span class="ot">&lt;-</span> </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>   <span class="fu">mars</span>(<span class="at">prod_degree =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span>  <span class="co">#&lt;- use GCV to choose terms</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_engine</span>(<span class="st">"earth"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>svm_r_spec <span class="ot">&lt;-</span> </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>   <span class="fu">svm_rbf</span>(<span class="at">cost =</span> <span class="fu">tune</span>(), <span class="at">rbf_sigma =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_engine</span>(<span class="st">"kernlab"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>svm_p_spec <span class="ot">&lt;-</span> </span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>   <span class="fu">svm_poly</span>(<span class="at">cost =</span> <span class="fu">tune</span>(), <span class="at">degree =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_engine</span>(<span class="st">"kernlab"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>knn_spec <span class="ot">&lt;-</span> </span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>   <span class="fu">nearest_neighbor</span>(<span class="at">neighbors =</span> <span class="fu">tune</span>(), <span class="at">dist_power =</span> <span class="fu">tune</span>(), <span class="at">weight_func =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_engine</span>(<span class="st">"kknn"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>cart_spec <span class="ot">&lt;-</span> </span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>   <span class="fu">decision_tree</span>(<span class="at">cost_complexity =</span> <span class="fu">tune</span>(), <span class="at">min_n =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_engine</span>(<span class="st">"rpart"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>bag_cart_spec <span class="ot">&lt;-</span> </span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>   <span class="fu">bag_tree</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_engine</span>(<span class="st">"rpart"</span>, <span class="at">times =</span> 50L) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>rf_spec <span class="ot">&lt;-</span> </span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>   <span class="fu">rand_forest</span>(<span class="at">mtry =</span> <span class="fu">tune</span>(), <span class="at">min_n =</span> <span class="fu">tune</span>(), <span class="at">trees =</span> <span class="dv">1000</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_engine</span>(<span class="st">"ranger"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>xgb_spec <span class="ot">&lt;-</span> </span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>   <span class="fu">boost_tree</span>(<span class="at">tree_depth =</span> <span class="fu">tune</span>(), <span class="at">learn_rate =</span> <span class="fu">tune</span>(), <span class="at">loss_reduction =</span> <span class="fu">tune</span>(), </span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>              <span class="at">min_n =</span> <span class="fu">tune</span>(), <span class="at">sample_size =</span> <span class="fu">tune</span>(), <span class="at">trees =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_engine</span>(<span class="st">"xgboost"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>cubist_spec <span class="ot">&lt;-</span> </span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>   <span class="fu">cubist_rules</span>(<span class="at">committees =</span> <span class="fu">tune</span>(), <span class="at">neighbors =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_engine</span>(<span class="st">"Cubist"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="extraer-el-conjunto-de-hiperparámetros-de-la-red-neuronal-monocapa" class="level3" data-number="4.1.3">
+<h3 data-number="4.1.3" class="anchored" data-anchor-id="extraer-el-conjunto-de-hiperparámetros-de-la-red-neuronal-monocapa"><span class="header-section-number">4.1.3</span> Extraer el conjunto de hiperparámetros de la red neuronal monocapa</h3>
+<p>En el caso de la red neuronal monocapa, fue necesario crear una especificación del hiperparámetro del número de unidades ocultas.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>nnet_param <span class="ot">&lt;-</span> </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>   nnet_spec <span class="sc">%&gt;%</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">extract_parameter_set_dials</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>   <span class="fu">update</span>(<span class="at">hidden_units =</span> <span class="fu">hidden_units</span>(<span class="at">range =</span> <span class="fu">c</span>(1L, 27L)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="creación-del-conjunto-de-flujos-de-trabajo" class="level3" data-number="4.1.4">
+<h3 data-number="4.1.4" class="anchored" data-anchor-id="creación-del-conjunto-de-flujos-de-trabajo"><span class="header-section-number">4.1.4</span> Creación del conjunto de flujos de trabajo</h3>
+<p>En este caso, es necesario especificar qué receta de preprocesamiento se aplica a cada modelo. Puede aplicarse más de una receta por modelo, considerando que cada interacción de receta y modelo creará un algoritmo único.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>normalized <span class="ot">&lt;-</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">workflow_set</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">preproc =</span> <span class="fu">list</span>(<span class="at">normalized =</span> normalized_rec), </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">models =</span> <span class="fu">list</span>(<span class="at">SVM_radial =</span> svm_r_spec, <span class="at">SVM_poly =</span> svm_p_spec, </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">KNN =</span> knn_spec, <span class="at">neural_network =</span> nnet_spec)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>   )</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>normalized</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A workflow set/tibble: 4 × 4
+  wflow_id                  info             option    result    
+  &lt;chr&gt;                     &lt;list&gt;           &lt;list&gt;    &lt;list&gt;    
+1 normalized_SVM_radial     &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+2 normalized_SVM_poly       &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+3 normalized_KNN            &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+4 normalized_neural_network &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>normalized <span class="sc">%&gt;%</span> <span class="fu">extract_workflow</span>(<span class="at">id =</span> <span class="st">"normalized_KNN"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>══ Workflow ════════════════════════════════════════════════════════════════════
+Preprocessor: Recipe
+Model: nearest_neighbor()
+
+── Preprocessor ────────────────────────────────────────────────────────────────
+2 Recipe Steps
+
+• step_mutate_at()
+• step_normalize()
+
+── Model ───────────────────────────────────────────────────────────────────────
+K-Nearest Neighbor Model Specification (regression)
+
+Main Arguments:
+  neighbors = tune()
+  weight_func = tune()
+  dist_power = tune()
+
+Computational engine: kknn </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>normalized <span class="ot">&lt;-</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>   normalized <span class="sc">%&gt;%</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">option_add</span>(<span class="at">param_info =</span> nnet_param, <span class="at">id =</span> <span class="st">"normalized_neural_network"</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>normalized</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A workflow set/tibble: 4 × 4
+  wflow_id                  info             option    result    
+  &lt;chr&gt;                     &lt;list&gt;           &lt;list&gt;    &lt;list&gt;    
+1 normalized_SVM_radial     &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+2 normalized_SVM_poly       &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+3 normalized_KNN            &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+4 normalized_neural_network &lt;tibble [1 × 4]&gt; &lt;opts[1]&gt; &lt;list [0]&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>simple_pre_proc <span class="ot">&lt;-</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">workflow_set</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">preproc =</span> <span class="fu">list</span>(<span class="at">simple =</span> data_rec), </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">models =</span> <span class="fu">list</span>(<span class="at">MARS =</span> mars_spec, <span class="at">CART =</span> cart_spec, <span class="at">CART_bagged =</span> bag_cart_spec,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">RF =</span> rf_spec, <span class="at">boosting =</span> xgb_spec, <span class="at">Cubist =</span> cubist_spec)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>   )</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>simple_pre_proc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A workflow set/tibble: 6 × 4
+  wflow_id           info             option    result    
+  &lt;chr&gt;              &lt;list&gt;           &lt;list&gt;    &lt;list&gt;    
+1 simple_MARS        &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+2 simple_CART        &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+3 simple_CART_bagged &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+4 simple_RF          &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+5 simple_boosting    &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+6 simple_Cubist      &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>with_features <span class="ot">&lt;-</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">workflow_set</span>(</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">preproc =</span> <span class="fu">list</span>(<span class="at">full_quad =</span> poly_recipe), </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">models =</span> <span class="fu">list</span>(<span class="at">linear_reg =</span> linear_reg_spec, <span class="at">KNN =</span> knn_spec)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>   )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>all_workflows <span class="ot">&lt;-</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">bind_rows</span>(simple_pre_proc, normalized, with_features) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>   <span class="co"># Make the workflow ID's a little more simple: </span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="at">wflow_id =</span> <span class="fu">gsub</span>(<span class="st">"(simple_)|(normalized_)"</span>, <span class="st">""</span>, wflow_id))</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>all_workflows</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A workflow set/tibble: 12 × 4
+   wflow_id             info             option    result    
+   &lt;chr&gt;                &lt;list&gt;           &lt;list&gt;    &lt;list&gt;    
+ 1 MARS                 &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+ 2 CART                 &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+ 3 CART_bagged          &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+ 4 RF                   &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+ 5 boosting             &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+ 6 Cubist               &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+ 7 SVM_radial           &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+ 8 SVM_poly             &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+ 9 KNN                  &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+10 neural_network       &lt;tibble [1 × 4]&gt; &lt;opts[1]&gt; &lt;list [0]&gt;
+11 full_quad_linear_reg &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+12 full_quad_KNN        &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="ajuste-y-evaluación-de-los-modelos" class="level3" data-number="4.1.5">
+<h3 data-number="4.1.5" class="anchored" data-anchor-id="ajuste-y-evaluación-de-los-modelos"><span class="header-section-number">4.1.5</span> Ajuste y evaluación de los modelos</h3>
+<p>Primero, probaremos con la calibración bayesiana de hiperparámetros. En aquellos algoritmos donde no es necesario calibrar hiperparámetros, se prueba un ajuste por defecto en cada folio.</p>
+<div class="cell">
+
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>bayes_ctrl <span class="ot">&lt;-</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">control_bayes</span>(</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>      <span class="co"># El corte entero para el número de iteraciones sin mejores resultados.</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">no_improve =</span> <span class="dv">10</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">extract =</span> identity,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">save_pred =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">verbose =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">parallel_over =</span> <span class="st">"everything"</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>full_results_time <span class="ot">&lt;-</span> </span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>   <span class="fu">system.time</span>(</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>      bayes_results <span class="ot">&lt;-</span> </span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>         all_workflows <span class="sc">%&gt;%</span> </span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>         <span class="fu">workflow_map</span>(<span class="at">seed =</span> <span class="dv">1503</span>,</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>                      <span class="at">resamples =</span> data_folds,</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>                      <span class="at">initial =</span> <span class="dv">5</span>, </span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>                      <span class="at">iter =</span> <span class="dv">50</span>,</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>                      <span class="at">metrics =</span> multi_met,</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>                      <span class="at">control =</span> bayes_ctrl,</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>                      <span class="at">verbose =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>   )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  1 of 12 tuning:     MARS</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `...` are not used in this function but one or more objects were
+passed: 'initial', 'iter'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  1 of 12 tuning:     MARS (23.9s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  2 of 12 tuning:     CART</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `...` are not used in this function but one or more objects were
+passed: 'initial', 'iter'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  2 of 12 tuning:     CART (47s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i   No tuning parameters. `fit_resamples()` will be attempted</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  3 of 12 resampling: CART_bagged</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  3 of 12 resampling: CART_bagged (1m 6s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  4 of 12 tuning:     RF</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `...` are not used in this function but one or more objects were
+passed: 'initial', 'iter'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i Creating pre-processing data to finalize unknown parameter: mtry</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  4 of 12 tuning:     RF (1m 8.1s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  5 of 12 tuning:     boosting</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `...` are not used in this function but one or more objects were
+passed: 'initial', 'iter'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  5 of 12 tuning:     boosting (1m 28.5s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  6 of 12 tuning:     Cubist</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `...` are not used in this function but one or more objects were
+passed: 'initial', 'iter'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  6 of 12 tuning:     Cubist (1m 3s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  7 of 12 tuning:     SVM_radial</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `...` are not used in this function but one or more objects were
+passed: 'initial', 'iter'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  7 of 12 tuning:     SVM_radial (35.5s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  8 of 12 tuning:     SVM_poly</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `...` are not used in this function but one or more objects were
+passed: 'initial', 'iter'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  8 of 12 tuning:     SVM_poly (18.5s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  9 of 12 tuning:     KNN</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `...` are not used in this function but one or more objects were
+passed: 'initial', 'iter'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  9 of 12 tuning:     KNN (17.8s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i 10 of 12 tuning:     neural_network</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `...` are not used in this function but one or more objects were
+passed: 'initial', 'iter'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ 10 of 12 tuning:     neural_network (21.4s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i 11 of 12 tuning:     full_quad_linear_reg</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `...` are not used in this function but one or more objects were
+passed: 'initial', 'iter'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ 11 of 12 tuning:     full_quad_linear_reg (20.2s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i 12 of 12 tuning:     full_quad_KNN</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `...` are not used in this function but one or more objects were
+passed: 'initial', 'iter'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ 12 of 12 tuning:     full_quad_KNN (23.3s)</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>bayes_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A workflow set/tibble: 12 × 4
+   wflow_id             info             option    result   
+   &lt;chr&gt;                &lt;list&gt;           &lt;list&gt;    &lt;list&gt;   
+ 1 MARS                 &lt;tibble [1 × 4]&gt; &lt;opts[5]&gt; &lt;tune[+]&gt;
+ 2 CART                 &lt;tibble [1 × 4]&gt; &lt;opts[5]&gt; &lt;tune[+]&gt;
+ 3 CART_bagged          &lt;tibble [1 × 4]&gt; &lt;opts[5]&gt; &lt;rsmp[+]&gt;
+ 4 RF                   &lt;tibble [1 × 4]&gt; &lt;opts[5]&gt; &lt;tune[+]&gt;
+ 5 boosting             &lt;tibble [1 × 4]&gt; &lt;opts[5]&gt; &lt;tune[+]&gt;
+ 6 Cubist               &lt;tibble [1 × 4]&gt; &lt;opts[5]&gt; &lt;tune[+]&gt;
+ 7 SVM_radial           &lt;tibble [1 × 4]&gt; &lt;opts[5]&gt; &lt;tune[+]&gt;
+ 8 SVM_poly             &lt;tibble [1 × 4]&gt; &lt;opts[5]&gt; &lt;tune[+]&gt;
+ 9 KNN                  &lt;tibble [1 × 4]&gt; &lt;opts[5]&gt; &lt;tune[+]&gt;
+10 neural_network       &lt;tibble [1 × 4]&gt; &lt;opts[6]&gt; &lt;tune[+]&gt;
+11 full_quad_linear_reg &lt;tibble [1 × 4]&gt; &lt;opts[5]&gt; &lt;tune[+]&gt;
+12 full_quad_KNN        &lt;tibble [1 × 4]&gt; &lt;opts[5]&gt; &lt;tune[+]&gt;</code></pre>
+</div>
+</div>
+<p>El siguiente resultado rankea u ordena los resultados de los algoritmos en validación cruzada según el <em>rmse</em>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>bayes_results <span class="sc">%&gt;%</span> </span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">rank_results</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"rmse"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>   <span class="fu">select</span>(model, .config, <span class="at">rmse =</span> mean, rank)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 103 × 4
+   model        .config                rmse  rank
+   &lt;chr&gt;        &lt;chr&gt;                 &lt;dbl&gt; &lt;int&gt;
+ 1 linear_reg   Preprocessor1_Model08  110.     1
+ 2 linear_reg   Preprocessor1_Model04  110.     2
+ 3 linear_reg   Preprocessor1_Model05  111.     3
+ 4 linear_reg   Preprocessor1_Model03  111.     4
+ 5 linear_reg   Preprocessor1_Model06  111.     5
+ 6 cubist_rules Preprocessor1_Model06  111.     6
+ 7 mlp          Preprocessor1_Model01  111.     7
+ 8 cubist_rules Preprocessor1_Model02  111.     8
+ 9 cubist_rules Preprocessor1_Model04  111.     9
+10 linear_reg   Preprocessor1_Model10  112.    10
+# … with 93 more rows</code></pre>
+</div>
+</div>
+<p>Se puede imprimir los resultados globales a continuación.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>   bayes_results,</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>   <span class="at">rank_metric =</span> <span class="st">"rmse"</span>,  <span class="co"># &lt;- how to order models</span></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>   <span class="at">metric =</span> <span class="st">"rmse"</span>,       <span class="co"># &lt;- which metric to visualize</span></span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>   <span class="at">select_best =</span> <span class="cn">TRUE</span>     <span class="co"># &lt;- one point per workflow</span></span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>   <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">y =</span> mean <span class="sc">-</span> <span class="dv">40</span>, <span class="at">label =</span> wflow_id), <span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>   <span class="fu">lims</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">250</span>)) <span class="sc">+</span></span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>   <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter3_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>O por cada algoritmo probado, especificándolo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(bayes_results, <span class="at">id =</span> <span class="st">"Cubist"</span>, <span class="at">metric =</span> <span class="st">"rmse"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter3_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="selección-eficaz-de-los-modelos" class="level3" data-number="4.1.6">
+<h3 data-number="4.1.6" class="anchored" data-anchor-id="selección-eficaz-de-los-modelos"><span class="header-section-number">4.1.6</span> Selección eficaz de los modelos</h3>
+<p>Para stacking es recomendable usar la búsqueda eficiente de cuadrículas mediante carreras con modelos ANOVA.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>race_ctrl <span class="ot">&lt;-</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">control_race</span>(</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">save_pred =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">parallel_over =</span> <span class="st">"everything"</span>,</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">save_workflow =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">verbose =</span> <span class="cn">TRUE</span></span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>   )</span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>full_race_results_time <span class="ot">&lt;-</span> </span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>   <span class="fu">system.time</span>(</span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>      race_results <span class="ot">&lt;-</span></span>
+<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a>   all_workflows <span class="sc">%&gt;%</span></span>
+<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a>   <span class="fu">workflow_map</span>(</span>
+<span id="cb59-14"><a href="#cb59-14" aria-hidden="true" tabindex="-1"></a>      <span class="st">"tune_race_anova"</span>,</span>
+<span id="cb59-15"><a href="#cb59-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">seed =</span> <span class="dv">1503</span>,</span>
+<span id="cb59-16"><a href="#cb59-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">resamples =</span> data_folds,</span>
+<span id="cb59-17"><a href="#cb59-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">grid =</span> <span class="dv">25</span>,</span>
+<span id="cb59-18"><a href="#cb59-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">control =</span> race_ctrl,</span>
+<span id="cb59-19"><a href="#cb59-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">verbose =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb59-20"><a href="#cb59-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">metrics =</span> multi_met)</span>
+<span id="cb59-21"><a href="#cb59-21" aria-hidden="true" tabindex="-1"></a>   )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  1 of 12 tuning:     MARS</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  1 of 12 tuning:     MARS (12.9s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  2 of 12 tuning:     CART</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  2 of 12 tuning:     CART (26.5s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i   No tuning parameters. `fit_resamples()` will be attempted</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  3 of 12 resampling: CART_bagged</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  3 of 12 resampling: CART_bagged (21s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  4 of 12 tuning:     RF</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i Creating pre-processing data to finalize unknown parameter: mtry</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  4 of 12 tuning:     RF (42.5s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  5 of 12 tuning:     boosting</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  5 of 12 tuning:     boosting (54.2s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  6 of 12 tuning:     Cubist</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  6 of 12 tuning:     Cubist (55.3s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  7 of 12 tuning:     SVM_radial</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  7 of 12 tuning:     SVM_radial (21.6s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  8 of 12 tuning:     SVM_poly</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  8 of 12 tuning:     SVM_poly (38.5s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i  9 of 12 tuning:     KNN</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔  9 of 12 tuning:     KNN (51.2s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i 10 of 12 tuning:     neural_network</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ 10 of 12 tuning:     neural_network (57.8s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i 11 of 12 tuning:     full_quad_linear_reg</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ 11 of 12 tuning:     full_quad_linear_reg (55.2s)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i 12 of 12 tuning:     full_quad_KNN</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ 12 of 12 tuning:     full_quad_KNN (52.1s)</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>race_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A workflow set/tibble: 12 × 4
+   wflow_id             info             option    result   
+   &lt;chr&gt;                &lt;list&gt;           &lt;list&gt;    &lt;list&gt;   
+ 1 MARS                 &lt;tibble [1 × 4]&gt; &lt;opts[4]&gt; &lt;race[+]&gt;
+ 2 CART                 &lt;tibble [1 × 4]&gt; &lt;opts[4]&gt; &lt;race[+]&gt;
+ 3 CART_bagged          &lt;tibble [1 × 4]&gt; &lt;opts[4]&gt; &lt;rsmp[+]&gt;
+ 4 RF                   &lt;tibble [1 × 4]&gt; &lt;opts[4]&gt; &lt;race[+]&gt;
+ 5 boosting             &lt;tibble [1 × 4]&gt; &lt;opts[4]&gt; &lt;race[+]&gt;
+ 6 Cubist               &lt;tibble [1 × 4]&gt; &lt;opts[4]&gt; &lt;race[+]&gt;
+ 7 SVM_radial           &lt;tibble [1 × 4]&gt; &lt;opts[4]&gt; &lt;race[+]&gt;
+ 8 SVM_poly             &lt;tibble [1 × 4]&gt; &lt;opts[4]&gt; &lt;race[+]&gt;
+ 9 KNN                  &lt;tibble [1 × 4]&gt; &lt;opts[4]&gt; &lt;race[+]&gt;
+10 neural_network       &lt;tibble [1 × 4]&gt; &lt;opts[5]&gt; &lt;race[+]&gt;
+11 full_quad_linear_reg &lt;tibble [1 × 4]&gt; &lt;opts[4]&gt; &lt;race[+]&gt;
+12 full_quad_KNN        &lt;tibble [1 × 4]&gt; &lt;opts[4]&gt; &lt;race[+]&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(</span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>   race_results,</span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>   <span class="at">rank_metric =</span> <span class="st">"rmse"</span>,  </span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>   <span class="at">metric =</span> <span class="st">"rmse"</span>,       </span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>   <span class="at">select_best =</span> <span class="cn">TRUE</span>    </span>
+<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a>   <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">y =</span> mean <span class="sc">-</span> <span class="dv">40</span>, <span class="at">label =</span> wflow_id), <span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb88-8"><a href="#cb88-8" aria-hidden="true" tabindex="-1"></a>   <span class="fu">lims</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">260</span>)) <span class="sc">+</span></span>
+<span id="cb88-9"><a href="#cb88-9" aria-hidden="true" tabindex="-1"></a>   <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter3_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>res_ranks <span class="ot">&lt;-</span></span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>  race_results <span class="sc">%&gt;%</span></span>
+<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rank_results</span>(<span class="st">'rmse'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">'rmse'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(wflow_id, model, .config, <span class="at">rmse =</span> mean, rank) <span class="sc">%&gt;%</span></span>
+<span id="cb89-6"><a href="#cb89-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">%&gt;%</span></span>
+<span id="cb89-7"><a href="#cb89-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(rank, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb89-8"><a href="#cb89-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb89-9"><a href="#cb89-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(rank)</span>
+<span id="cb89-10"><a href="#cb89-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-11"><a href="#cb89-11" aria-hidden="true" tabindex="-1"></a>res_ranks</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 11 × 5
+   wflow_id             model            .config                rmse  rank
+   &lt;chr&gt;                &lt;chr&gt;            &lt;chr&gt;                 &lt;dbl&gt; &lt;int&gt;
+ 1 full_quad_linear_reg linear_reg       Preprocessor1_Model09  109.     1
+ 2 Cubist               cubist_rules     Preprocessor1_Model07  110.     5
+ 3 MARS                 mars             Preprocessor1_Model1   117.    25
+ 4 SVM_poly             svm_poly         Preprocessor1_Model09  127.    26
+ 5 neural_network       mlp              Preprocessor1_Model19  128.    27
+ 6 SVM_radial           svm_rbf          Preprocessor1_Model13  140.    40
+ 7 boosting             boost_tree       Preprocessor1_Model03  154.    45
+ 8 full_quad_KNN        nearest_neighbor Preprocessor1_Model02  154.    46
+ 9 RF                   rand_forest      Preprocessor1_Model08  155.    47
+10 CART_bagged          bag_tree         Preprocessor1_Model1   165.    54
+11 CART                 decision_tree    Preprocessor1_Model02  213.    66</code></pre>
+</div>
+</div>
+<p>A continuación se muestra un plot de calibración entre ambos procesos de validación cruzada.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>matched_results <span class="ot">&lt;-</span> </span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>   workflowsets<span class="sc">::</span><span class="fu">rank_results</span>(race_results, <span class="at">select_best =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>   dplyr<span class="sc">::</span><span class="fu">select</span>(wflow_id, .metric, <span class="at">race =</span> mean, <span class="at">config_race =</span> .config) <span class="sc">%&gt;%</span> </span>
+<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a>   dplyr<span class="sc">::</span><span class="fu">inner_join</span>(</span>
+<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a>      workflowsets<span class="sc">::</span><span class="fu">rank_results</span>(bayes_results, <span class="at">select_best =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb91-6"><a href="#cb91-6" aria-hidden="true" tabindex="-1"></a>         dplyr<span class="sc">::</span><span class="fu">select</span>(wflow_id, .metric, <span class="at">complete =</span> mean, </span>
+<span id="cb91-7"><a href="#cb91-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">config_complete =</span> .config, model),</span>
+<span id="cb91-8"><a href="#cb91-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"wflow_id"</span>, <span class="st">".metric"</span>),</span>
+<span id="cb91-9"><a href="#cb91-9" aria-hidden="true" tabindex="-1"></a>   ) <span class="sc">%&gt;%</span>  </span>
+<span id="cb91-10"><a href="#cb91-10" aria-hidden="true" tabindex="-1"></a>   dplyr<span class="sc">::</span><span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"rmse"</span>)</span>
+<span id="cb91-11"><a href="#cb91-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb91-12"><a href="#cb91-12" aria-hidden="true" tabindex="-1"></a>matched_results <span class="sc">%&gt;%</span> </span>
+<span id="cb91-13"><a href="#cb91-13" aria-hidden="true" tabindex="-1"></a>   <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> complete, <span class="at">y =</span> race)) <span class="sc">+</span> </span>
+<span id="cb91-14"><a href="#cb91-14" aria-hidden="true" tabindex="-1"></a>   <span class="fu">geom_abline</span>(<span class="at">lty =</span> <span class="dv">3</span>) <span class="sc">+</span> </span>
+<span id="cb91-15"><a href="#cb91-15" aria-hidden="true" tabindex="-1"></a>   <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb91-16"><a href="#cb91-16" aria-hidden="true" tabindex="-1"></a>   <span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> model)) <span class="sc">+</span></span>
+<span id="cb91-17"><a href="#cb91-17" aria-hidden="true" tabindex="-1"></a>   <span class="fu">coord_obs_pred</span>() <span class="sc">+</span> </span>
+<span id="cb91-18"><a href="#cb91-18" aria-hidden="true" tabindex="-1"></a>   <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Complete Bayes RMSE"</span>, <span class="at">y =</span> <span class="st">"Racing RMSE"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter3_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Se elige el mejor modelo a continuación:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>wflow_id_best <span class="ot">&lt;-</span> </span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>  res_ranks <span class="sc">%&gt;%</span> </span>
+<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(rank, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(wflow_id)</span>
+<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb92-6"><a href="#cb92-6" aria-hidden="true" tabindex="-1"></a>wf_best <span class="ot">&lt;-</span></span>
+<span id="cb92-7"><a href="#cb92-7" aria-hidden="true" tabindex="-1"></a>  race_results <span class="sc">%&gt;%</span> </span>
+<span id="cb92-8"><a href="#cb92-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_workflow_set_result</span>(wflow_id_best) <span class="sc">%&gt;%</span> </span>
+<span id="cb92-9"><a href="#cb92-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_best</span>(<span class="at">metric =</span> <span class="st">'rmse'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="finalizar-un-modelo" class="level3" data-number="4.1.7">
+<h3 data-number="4.1.7" class="anchored" data-anchor-id="finalizar-un-modelo"><span class="header-section-number">4.1.7</span> Finalizar un modelo</h3>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<p>Realizamos el ajuste final del mejor modelo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>fit_best <span class="ot">&lt;-</span></span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>  race_results <span class="sc">%&gt;%</span> </span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull_workflow</span>(wflow_id_best) <span class="sc">%&gt;%</span> </span>
+<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">finalize_workflow</span>(wf_best) <span class="sc">%&gt;%</span> </span>
+<span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">last_fit</span>(<span class="at">split =</span> data_split)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `pull_workflow()` was deprecated in workflowsets 0.1.0.
+ℹ Please use `extract_workflow()` instead.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>metrics_best <span class="ot">&lt;-</span></span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a>  fit_best <span class="sc">%&gt;%</span> </span>
+<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>()</span>
+<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>fit_best <span class="sc">%&gt;%</span> </span>
+<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 127 × 5
+   id               .pred  .row yield .config             
+   &lt;chr&gt;            &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;               
+ 1 train/test split 6041.     1 5996. Preprocessor1_Model1
+ 2 train/test split 5499.     3 5502. Preprocessor1_Model1
+ 3 train/test split 4148.     6 3968. Preprocessor1_Model1
+ 4 train/test split 3262.     8 3139. Preprocessor1_Model1
+ 5 train/test split 6345.     9 6126. Preprocessor1_Model1
+ 6 train/test split 6256.    12 6244. Preprocessor1_Model1
+ 7 train/test split 5668.    15 5482. Preprocessor1_Model1
+ 8 train/test split 6617.    17 6578. Preprocessor1_Model1
+ 9 train/test split 7328.    18 7267. Preprocessor1_Model1
+10 train/test split 5883.    19 5747. Preprocessor1_Model1
+# … with 117 more rows</code></pre>
+</div>
+</div>
+<p>Observamos el ajuste a nivel de testeo interno.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>fit_best <span class="sc">%&gt;%</span> </span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> yield, <span class="at">y =</span> .pred)) <span class="sc">+</span> </span>
+<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a>   <span class="fu">geom_abline</span>(<span class="at">color =</span> <span class="st">"gray50"</span>, <span class="at">lty =</span> <span class="dv">2</span>) <span class="sc">+</span> </span>
+<span id="cb97-5"><a href="#cb97-5" aria-hidden="true" tabindex="-1"></a>   <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span> </span>
+<span id="cb97-6"><a href="#cb97-6" aria-hidden="true" tabindex="-1"></a>   <span class="fu">coord_obs_pred</span>() <span class="sc">+</span> </span>
+<span id="cb97-7"><a href="#cb97-7" aria-hidden="true" tabindex="-1"></a>   <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"observed"</span>, <span class="at">y =</span> <span class="st">"predicted"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter3_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Reajustamos el modelo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>model_test_results_ex <span class="ot">&lt;-</span> race_results <span class="sc">%&gt;%</span> </span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull_workflow</span>(wflow_id_best) <span class="sc">%&gt;%</span> </span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">finalize_workflow</span>(wf_best) <span class="sc">%&gt;%</span> </span>
+<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> <span class="fu">bind_rows</span>(data_train,</span>
+<span id="cb98-5"><a href="#cb98-5" aria-hidden="true" tabindex="-1"></a>                     data_test))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Y comprobamos las métricas a nivel de testeo externo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PREDICCIÓN </span><span class="al">TEST</span><span class="co"> ----</span></span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
+<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>predicciones_ext <span class="ot">&lt;-</span> model_test_results_ex <span class="sc">%&gt;%</span></span>
+<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">predict</span>(</span>
+<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_data =</span> data_new,</span>
+<span id="cb99-6"><a href="#cb99-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># poly_recipe %&gt;% </span></span>
+<span id="cb99-7"><a href="#cb99-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   prep() %&gt;%</span></span>
+<span id="cb99-8"><a href="#cb99-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   bake(new_data = data_new),</span></span>
+<span id="cb99-9"><a href="#cb99-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">"numeric"</span></span>
+<span id="cb99-10"><a href="#cb99-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb99-11"><a href="#cb99-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-12"><a href="#cb99-12" aria-hidden="true" tabindex="-1"></a><span class="co"># MÉTRICAS </span><span class="al">TEST</span><span class="co"> ----</span></span>
+<span id="cb99-13"><a href="#cb99-13" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
+<span id="cb99-14"><a href="#cb99-14" aria-hidden="true" tabindex="-1"></a>predicciones_bm_ext <span class="ot">&lt;-</span> predicciones_ext <span class="sc">%&gt;%</span> </span>
+<span id="cb99-15"><a href="#cb99-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(data_new <span class="sc">%&gt;%</span> <span class="fu">select</span>(yield)) <span class="sc">%&gt;%</span></span>
+<span id="cb99-16"><a href="#cb99-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"best model"</span>)</span>
+<span id="cb99-17"><a href="#cb99-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-18"><a href="#cb99-18" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(predicciones_bm_ext)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     .pred          yield         modelo         
+ Min.   :2297   Min.   :1946   Length:354        
+ 1st Qu.:4510   1st Qu.:4514   Class :character  
+ Median :5299   Median :5555   Mode  :character  
+ Mean   :5177   Mean   :5360                     
+ 3rd Qu.:5896   3rd Qu.:6237                     
+ Max.   :7036   Max.   :7805                     </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Error de test</span></span>
+<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a>error_test_bm_ext  <span class="ot">&lt;-</span> <span class="fu">multi_met</span>(</span>
+<span id="cb101-4"><a href="#cb101-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data     =</span> predicciones_bm_ext,</span>
+<span id="cb101-5"><a href="#cb101-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">truth    =</span> yield,</span>
+<span id="cb101-6"><a href="#cb101-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimate =</span> .pred,</span>
+<span id="cb101-7"><a href="#cb101-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">na_rm    =</span> <span class="cn">TRUE</span></span>
+<span id="cb101-8"><a href="#cb101-8" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb101-9"><a href="#cb101-9" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb101-10"><a href="#cb101-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">modelo =</span> <span class="st">"best model"</span></span>
+<span id="cb101-11"><a href="#cb101-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb101-12"><a href="#cb101-12" aria-hidden="true" tabindex="-1"></a>error_test_bm_ext</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 4
+  .metric .estimator .estimate modelo    
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;     
+1 rmse    standard     320.    best model
+2 rsq     standard       0.975 best model
+3 mape    standard       4.83  best model
+4 mae     standard     263.    best model</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a>predicciones_bm_ext <span class="sc">%&gt;%</span> </span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> yield, <span class="at">y =</span> .pred)) <span class="sc">+</span> </span>
+<span id="cb103-3"><a href="#cb103-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">geom_abline</span>(<span class="at">color =</span> <span class="st">"gray50"</span>, <span class="at">lty =</span> <span class="dv">2</span>) <span class="sc">+</span> </span>
+<span id="cb103-4"><a href="#cb103-4" aria-hidden="true" tabindex="-1"></a>   <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span> </span>
+<span id="cb103-5"><a href="#cb103-5" aria-hidden="true" tabindex="-1"></a>   <span class="fu">coord_obs_pred</span>() <span class="sc">+</span> </span>
+<span id="cb103-6"><a href="#cb103-6" aria-hidden="true" tabindex="-1"></a>   <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"observed"</span>, <span class="at">y =</span> <span class="st">"predicted"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter3_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="creación-del-conjunto-de-entrenamiento-para-el-apilamiento" class="level3" data-number="4.1.8">
+<h3 data-number="4.1.8" class="anchored" data-anchor-id="creación-del-conjunto-de-entrenamiento-para-el-apilamiento"><span class="header-section-number">4.1.8</span> Creación del conjunto de entrenamiento para el apilamiento</h3>
+<p>En este paso, añadiremos todos los modelos a un proceso de apilamiento o stacking.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>data_stack <span class="ot">&lt;-</span> </span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stacks</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_candidates</span>(race_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The inputted `candidates` argument `boosting` generated notes during
+tuning/resampling. Model stacking may fail due to these issues; see
+`collect_notes()` (`?tune::collect_notes()`) if so.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The inputted `candidates` argument `neural_network` generated notes during
+tuning/resampling. Model stacking may fail due to these issues; see
+`collect_notes()` (`?tune::collect_notes()`) if so.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>data_stack</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A data stack with 12 model definitions and 68 candidate members:
+#   MARS: 1 model configuration
+#   CART: 3 model configurations
+#   CART_bagged: 1 model configuration
+#   RF: 2 model configurations
+#   boosting: 2 model configurations
+#   Cubist: 13 model configurations
+#   SVM_radial: 1 model configuration
+#   SVM_poly: 8 model configurations
+#   KNN: 14 model configurations
+#   neural_network: 10 model configurations
+#   full_quad_linear_reg: 11 model configurations
+#   full_quad_KNN: 2 model configurations
+# Outcome: yield (numeric)</code></pre>
+</div>
+</div>
+</section>
+<section id="mezclar-las-predicciones" class="level3" data-number="4.1.9">
+<h3 data-number="4.1.9" class="anchored" data-anchor-id="mezclar-las-predicciones"><span class="header-section-number">4.1.9</span> Mezclar las predicciones</h3>
+<p>A continuación verificamos las métricas del modelo apilado en con una regresión Lasso.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2002</span>)</span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a>ens <span class="ot">&lt;-</span> <span class="fu">blend_predictions</span>(data_stack, </span>
+<span id="cb109-3"><a href="#cb109-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">penalty =</span> <span class="dv">10</span><span class="sc">^</span><span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">length =</span> <span class="dv">20</span>),</span>
+<span id="cb109-4"><a href="#cb109-4" aria-hidden="true" tabindex="-1"></a>                         <span class="at">metric =</span> multi_met)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Verificamos la evolución de las métricas a medida que cambia el lambda.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(ens)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter3_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Podemos validar los pesos de cada modelo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a>ens</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── A stacked ensemble model ─────────────────────────────────────
+
+Out of 68 possible candidate members, the ensemble retained 9.
+Penalty: 0.316227766016838.
+Mixture: 1.
+
+The 9 highest weighted members are:</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 × 3
+  member                    type         weight
+  &lt;chr&gt;                     &lt;chr&gt;         &lt;dbl&gt;
+1 full_quad_linear_reg_1_09 linear_reg   0.245 
+2 Cubist_1_10               cubist_rules 0.226 
+3 Cubist_1_07               cubist_rules 0.154 
+4 MARS_1_1                  mars         0.0975
+5 Cubist_1_06               cubist_rules 0.0883
+6 neural_network_1_17       mlp          0.0714
+7 neural_network_1_14       mlp          0.0467
+8 Cubist_1_01               cubist_rules 0.0423
+9 boosting_1_04             boost_tree   0.0300</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Members have not yet been fitted with `fit_members()`.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb115"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(ens, <span class="st">"weights"</span>) <span class="sc">+</span></span>
+<span id="cb115-2"><a href="#cb115-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">x =</span> weight <span class="sc">+</span> <span class="fl">0.01</span>, <span class="at">label =</span> model), <span class="at">hjust =</span> <span class="dv">0</span>) <span class="sc">+</span> </span>
+<span id="cb115-3"><a href="#cb115-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb115-4"><a href="#cb115-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lims</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.01</span>, <span class="fl">0.3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter3_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="ajustar-los-modelos-de-los-miembros" class="level3" data-number="4.1.10">
+<h3 data-number="4.1.10" class="anchored" data-anchor-id="ajustar-los-modelos-de-los-miembros"><span class="header-section-number">4.1.10</span> Ajustar los modelos de los miembros</h3>
+<p>Todos aquellos modelos cuyo peso o coeficiente sea diferente de cero, serán considerados miembros. Los miembros deben entrenarse en el conjunto de entrenamiento completo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a>ens_fit <span class="ot">&lt;-</span> <span class="fu">fit_members</span>(ens)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Si deseas, puede verificar el ajuste de cada miembro. Por ejemplo, del mejor modelo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb117"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_parameters</span>(ens_fit, <span class="st">"full_quad_linear_reg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 11 × 4
+   member                     penalty mixture  coef
+   &lt;chr&gt;                        &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;
+ 1 full_quad_linear_reg_1_09 8.56e- 2   0.384 0.245
+ 2 full_quad_linear_reg_1_11 1.98e- 1   0.447 0    
+ 3 full_quad_linear_reg_1_12 2.07e- 2   0.496 0    
+ 4 full_quad_linear_reg_1_13 8.13e-10   0.518 0    
+ 5 full_quad_linear_reg_1_14 1.96e- 7   0.562 0    
+ 6 full_quad_linear_reg_1_15 2.05e- 4   0.585 0    
+ 7 full_quad_linear_reg_1_16 3.13e- 5   0.633 0    
+ 8 full_quad_linear_reg_1_17 4.71e- 2   0.692 0    
+ 9 full_quad_linear_reg_1_18 6.19e- 1   0.732 0    
+10 full_quad_linear_reg_1_19 4.73e- 5   0.767 0    
+11 full_quad_linear_reg_1_20 4.03e-10   0.779 0    </code></pre>
+</div>
+</div>
+</section>
+<section id="resultados-del-conjunto-de-pruebas" class="level3" data-number="4.1.11">
+<h3 data-number="4.1.11" class="anchored" data-anchor-id="resultados-del-conjunto-de-pruebas"><span class="header-section-number">4.1.11</span> Resultados del conjunto de pruebas</h3>
+<p>Podemos realizar el testeo interno.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb119"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a>ens_test_pred <span class="ot">&lt;-</span> </span>
+<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">predict</span>(ens_fit, data_test) <span class="sc">%&gt;%</span> </span>
+<span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(data_test)</span>
+<span id="cb119-4"><a href="#cb119-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb119-5"><a href="#cb119-5" aria-hidden="true" tabindex="-1"></a>ens_test_pred <span class="sc">%&gt;%</span> </span>
+<span id="cb119-6"><a href="#cb119-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">multi_met</span>(yield, .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 rmse    standard     105.   
+2 rsq     standard       0.992
+3 mape    standard       1.37 
+4 mae     standard      85.2  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ens_test_pred) <span class="sc">+</span></span>
+<span id="cb121-2"><a href="#cb121-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> yield, </span>
+<span id="cb121-3"><a href="#cb121-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> .pred) <span class="sc">+</span></span>
+<span id="cb121-4"><a href="#cb121-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">color =</span> <span class="st">"gray50"</span>, <span class="at">lty =</span> <span class="dv">2</span>) <span class="sc">+</span> </span>
+<span id="cb121-5"><a href="#cb121-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb121-6"><a href="#cb121-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_obs_pred</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter3_files/figure-html/unnamed-chunk-42-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>En este paso, verificamos como cambian las métricas de cada modelo en el testeo interno. Es necesario observar si el modelo apilado a mejorado su rendimiento predictivo con respecto al mejor modelo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb122"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a>member_preds <span class="ot">&lt;-</span> </span>
+<span id="cb122-2"><a href="#cb122-2" aria-hidden="true" tabindex="-1"></a>  data_test <span class="sc">%&gt;%</span></span>
+<span id="cb122-3"><a href="#cb122-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(yield) <span class="sc">%&gt;%</span></span>
+<span id="cb122-4"><a href="#cb122-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="fu">predict</span>(ens_fit, data_test, <span class="at">members =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb122-5"><a href="#cb122-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb122-6"><a href="#cb122-6" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dfr</span>(member_preds, <span class="at">.f =</span> rmse, <span class="at">truth =</span> yield, <span class="at">data =</span> member_preds) <span class="sc">%&gt;%</span></span>
+<span id="cb122-7"><a href="#cb122-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">member =</span> <span class="fu">colnames</span>(member_preds))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 11 × 4
+   .metric .estimator .estimate member                   
+   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;                    
+ 1 rmse    standard          0  yield                    
+ 2 rmse    standard        105. .pred                    
+ 3 rmse    standard        121. MARS_1_1                 
+ 4 rmse    standard        130. boosting_1_04            
+ 5 rmse    standard        109. Cubist_1_01              
+ 6 rmse    standard        108. Cubist_1_06              
+ 7 rmse    standard        108. Cubist_1_07              
+ 8 rmse    standard        110. Cubist_1_10              
+ 9 rmse    standard        110. neural_network_1_17      
+10 rmse    standard        113. neural_network_1_14      
+11 rmse    standard        106. full_quad_linear_reg_1_09</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dfr</span>(member_preds, <span class="at">.f =</span> mape, <span class="at">truth =</span> yield, <span class="at">data =</span> member_preds) <span class="sc">%&gt;%</span></span>
+<span id="cb124-2"><a href="#cb124-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">member =</span> <span class="fu">colnames</span>(member_preds))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 11 × 4
+   .metric .estimator .estimate member                   
+   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;                    
+ 1 mape    standard        0    yield                    
+ 2 mape    standard        1.37 .pred                    
+ 3 mape    standard        1.57 MARS_1_1                 
+ 4 mape    standard        1.60 boosting_1_04            
+ 5 mape    standard        1.40 Cubist_1_01              
+ 6 mape    standard        1.41 Cubist_1_06              
+ 7 mape    standard        1.42 Cubist_1_07              
+ 8 mape    standard        1.43 Cubist_1_10              
+ 9 mape    standard        1.41 neural_network_1_17      
+10 mape    standard        1.43 neural_network_1_14      
+11 mape    standard        1.39 full_quad_linear_reg_1_09</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dfr</span>(member_preds, <span class="at">.f =</span> mae, <span class="at">truth =</span> yield, <span class="at">data =</span> member_preds) <span class="sc">%&gt;%</span></span>
+<span id="cb126-2"><a href="#cb126-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">member =</span> <span class="fu">colnames</span>(member_preds))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 11 × 4
+   .metric .estimator .estimate member                   
+   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;                    
+ 1 mae     standard         0   yield                    
+ 2 mae     standard        85.2 .pred                    
+ 3 mae     standard        96.0 MARS_1_1                 
+ 4 mae     standard       102.  boosting_1_04            
+ 5 mae     standard        88.7 Cubist_1_01              
+ 6 mae     standard        87.6 Cubist_1_06              
+ 7 mae     standard        88.0 Cubist_1_07              
+ 8 mae     standard        89.9 Cubist_1_10              
+ 9 mae     standard        87.8 neural_network_1_17      
+10 mae     standard        88.5 neural_network_1_14      
+11 mae     standard        85.5 full_quad_linear_reg_1_09</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dfr</span>(member_preds, <span class="at">.f =</span> rsq, <span class="at">truth =</span> yield, <span class="at">data =</span> member_preds) <span class="sc">%&gt;%</span></span>
+<span id="cb128-2"><a href="#cb128-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">member =</span> <span class="fu">colnames</span>(member_preds))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 11 × 4
+   .metric .estimator .estimate member                   
+   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;                    
+ 1 rsq     standard       1     yield                    
+ 2 rsq     standard       0.992 .pred                    
+ 3 rsq     standard       0.990 MARS_1_1                 
+ 4 rsq     standard       0.988 boosting_1_04            
+ 5 rsq     standard       0.992 Cubist_1_01              
+ 6 rsq     standard       0.992 Cubist_1_06              
+ 7 rsq     standard       0.992 Cubist_1_07              
+ 8 rsq     standard       0.991 Cubist_1_10              
+ 9 rsq     standard       0.992 neural_network_1_17      
+10 rsq     standard       0.991 neural_network_1_14      
+11 rsq     standard       0.992 full_quad_linear_reg_1_09</code></pre>
+</div>
+</div>
+<p>Ahora el testeo externo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb130"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a>ens_test_pred_ex <span class="ot">&lt;-</span> </span>
+<span id="cb130-2"><a href="#cb130-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">predict</span>(ens_fit, data_new) <span class="sc">%&gt;%</span> </span>
+<span id="cb130-3"><a href="#cb130-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(data_new)</span>
+<span id="cb130-4"><a href="#cb130-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb130-5"><a href="#cb130-5" aria-hidden="true" tabindex="-1"></a>ens_test_pred_ex <span class="sc">%&gt;%</span> </span>
+<span id="cb130-6"><a href="#cb130-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">multi_met</span>(yield, .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 rmse    standard     316.   
+2 rsq     standard       0.973
+3 mape    standard       4.91 
+4 mae     standard     261.   </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb132"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ens_test_pred_ex) <span class="sc">+</span></span>
+<span id="cb132-2"><a href="#cb132-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> yield, </span>
+<span id="cb132-3"><a href="#cb132-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> .pred) <span class="sc">+</span></span>
+<span id="cb132-4"><a href="#cb132-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">color =</span> <span class="st">"gray50"</span>, <span class="at">lty =</span> <span class="dv">2</span>) <span class="sc">+</span> </span>
+<span id="cb132-5"><a href="#cb132-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb132-6"><a href="#cb132-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_obs_pred</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter3_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } 
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./chapter2.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelamiento en tidymodels con el motor ranger.</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

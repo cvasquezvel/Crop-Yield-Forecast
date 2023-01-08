@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Crop Yield Forecast in tidymodels - 1&nbsp; Introducción</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./chapter1.html" rel="next">
+<link href="./index.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introducción</span></h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Crop Yield Forecast in tidymodels</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle sidebar-tool" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Prefacio</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introducción</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapter1.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Modelamiento en tidymodels con el motor lm.</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapter2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelamiento en tidymodels con el motor ranger.</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapter3.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Revisión de muchos modelos y Ensamblado de modelos en tidymodels.</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#crop-yield-forecast" id="toc-crop-yield-forecast" class="nav-link active" data-scroll-target="#crop-yield-forecast"> <span class="header-section-number">1.1</span> Crop Yield Forecast</a></li>
+  <li><a href="#tidymodels" id="toc-tidymodels" class="nav-link" data-scroll-target="#tidymodels"> <span class="header-section-number">1.2</span> Tidymodels</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introducción</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<p>Los productores agrícolas estiman su producción de la campaña y la producción semanal para planificar la compra de materiales, contrato de mano de obra, de transporte, habilitación de almacenes, entre otros, con el objetivo de hacer más rentable la actividad agrícola. Para estos productores, es fundamental garantizar contratos de venta del producto final con aquellos clientes que puedan pagar más; para lograr esto, se necesita estimaciones certeras de la producción, que les permitan negociar y tomar decisiones maniobrables a mediano plazo.</p>
+<p>Por lo general, las estimaciones de producción global de la campaña son certeras. El negocio agrícola considera certera una proyección que tiene de 5 % a 15 % de error predictivo (según el caso). El problema principal está en determinar la distribución de la producción en el tiempo (ya sea a nivel diario, semanal o mensual).</p>
+<p>En la literatura abundan las técnicas que permiten las estimaciones de cosecha o producción a nivel de campaña, aunque, existe una brecha literaria, muy grande, por cubrir en el caso de estimaciones a nivel semanal.</p>
+<p>Por otro lado, la escasez de profesionales especializados en pronósticos de cosecha y producción agrícola, hace que el problema sea mucho más fuerte. Sobre esto, mi percepción personal es que el talento existe, pero existen factores motivacionales que los orientan a otros rubros. La motivación extrínseca es mucho más fuerte en otros sectores, donde estadísticos altamente capacitados pueden sacar una mayor ventaja económica de sus habilidades (podemos hablar sobre esto en otro momento). Igualmente, podemos hablar de las estrategias empleadas por áreas en formación como algo que se está mejorando con el tiempo, pero, se necesita más empuje e inversión por parte de las empresas agrícolas. El entrenamiento y capacitación es clave cuando se usa profesionales junior. La cabeza del proyecto o área necesariamente debe ser alguien experimentado en modelos predictivos.</p>
+<p>Frente a este problema, han aparecido muchas empresas que brindan servicios de pronósticos de producción. Entre las ventajas de estas empresas están su alto crecimiento e inversión en contratación de profesionales altamente especializados en forecasting, pero, su principal desventaja es que muchas de ellas operan de forma remota, entonces, viven las proyecciones agrícolas solo como una revisión de datos y predicciones sin interpretación por expertos, y no como un arte que necesita de la cooperación con especialistas agrícolas que te ayudan a validar los modelos desde un aspecto más empírico y lógico (pero extremadamente necesario).</p>
+<p>Para hacer frente a estos problemas, es necesario contar con la cooperación académica. Los avances locales sobre estos temas aún son básicos. Podemos ver mayores avances sobre la materia en escuelas profesionales extranjeras. Revisar los artículos científicos que se publican a nivel internacional ayuda a entender el estado del arte de las proyecciones agrícolas y a orientar el modelamiento predictivo hacia las nuevas corrientes que vienen apareciendo en agricultura. No podemos descartar los avances que se tienen en problemas similares (por ejemplo, en predicción clínica).</p>
+<section id="crop-yield-forecast" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="crop-yield-forecast"><span class="header-section-number">1.1</span> Crop Yield Forecast</h2>
+<p>El pronóstico del rendimiento de cultivos es un arte, que nace como parte del modelamiento de cultivos. Las primeras publicaciones en <em>Crop Modelling</em> llegaron de la mano de Duncan y deWit en la década de 1960. Inicialmente se resolvía problemas que se trataban de resolver mediante inferencia, por ejemplo, evaluar los efectos de los niveles de fertilización en los rendimientos y el comportamiento agronómico de cultivos.</p>
+<p>Una de mis historias favoritas de profesionales que dieron los primeros pasos en <em>Crop Modelling,</em> es la de Montgomery, autor del libro Diseño y análisis de experimentos, un estadístico que compró un viñedo y llegó a producir un vino que fue premiado por su alta calidad, como resultado de años de investigación en fertilización, poscosecha de la vid y proceso de producción del vino, respaldado por un alto nivel de análisis estadístico. Por estos tiempos, la inferencia en modelamiento de cultivos es un área ampliamente estudiada y conocida.</p>
+<p>Con el nacimiento del aprendizaje estadístico por parte de Efron y Tibshirani (1991, 1994), se fundan las bases del modelamiento predictivo y es a partir del 2000, con los avances en estadística computacional, que se disparan las investigaciones en diversas ciencias, sobre cómo usar la estadística para resolver problemas reales en predicción. Ahora, es cada vez más accesible tener recursos computacionales (tanto en hardware como software), necesarios para hacer modelamiento predictivo, y esto es un detonante de que cada vez más profesionales exploren sobre este arte.</p>
+<p>En el caso del <em>Crop Yield Forecast</em>, todos estos avances han servido para resolver, como un problema de regresión o serie de tiempo, diversas estimaciones empleando técnicas de aprendizaje estadístico, estadística espacial, remote sensing, entre otros. Aunque usar imágenes satelitales y multiespectrales para hacer proyecciones de la producción de cultivos es algo muy usual actualmente, sigue siendo difícil encontrar aplicaciones en cultivos de exportación y no tradicionales, sobretodo si se trata de cultivos donde la aparición de flores es continua e “infinita” y solo sirven para estimar producción total de una campaña.</p>
+<p>Debemos entender que de forma empírica, las estimaciones de cosecha se realizan en muchos cultivos teniendo en cuenta una fórmula matemática como la siguiente:</p>
+<p><span class="math display">\[Producción = Área * Densidad~de~siembra * Número~de~órganos~por~planta * Peso~de~ órganos\]</span></p>
+<p>Entendiéndose con esta fórmula que para estimar la producción por campaña de cualquier cultivo, se necesita información de la extensión de siembra, número de plantas por hectárea, número de órganos a cosechar y el peso promedio de estos órganos.</p>
+<p>Para fines logísticos, hacer una estimación de producción a nivel de campaña no ayuda mucho, ya que se necesita saber la producción en distintos puntos de corte o periodos de tiempo.</p>
+<p>Para esto último fin, podemos hacer una modificación a la ecuación, obteniendo lo siguiente:</p>
+<p><span class="math display">\[Producción_{(t)} = Área * Densidad~de~siembra * Número~de~órganos~por~planta_{(t)} * Peso~de~órganos_{(t)} * Tasa~de~maduración_{(t)}\]</span></p>
+<p>Esta última ecuación añade un modelamiento temporal, que está en función de la tasa de maduración y crecimiento de los órganos a cosechar.</p>
+<p>Entonces, para empezar a realizar <em>Crop Yield Forecast</em>, debemos entender que existe en el tiempo uno o más factores que condicionarán la producción en distintos puntos transversales y por ello debemos tomar datos horizontales o de series de tiempo en el cultivo, pues serán fundamentales para realizar las proyecciones. Es así, que debemos imaginar cualquier algoritmo como una función similar a esta última ecuación matemática y debemos lograr que el modelo por crear, a través del aprendizaje estadístico, cumpla con la lógica necesaria para simular este comportamiento matemático (que fue pensado para simular el comportamiento real del cultivo).</p>
+<p>Evidentemente, existen variables como el clima, el riego (agua), el suelo y el hombre (manejo agronómico), que intervienen en la respuesta real de la producción agrícola. Entender la relación que existe entre estas variables y la producción, es fundamental para tener éxito en el modelamiento.</p>
+<p>Ya para empezar con <em>tidymodels</em>, mucho más allá del modelamiento predictivo, que es la última fase del proceso del <em>Crop Yield Forecast</em>, el obtener datos calidad es el mayor desafío. Un esquema de muestreo adecuado, es el pilar del éxito. Tener un equipo que sepa como implementar y mejorar un esquema de muestreo es lo más importante, más allá de si se usa mano de obra o inteligencia artificial para recolectar los datos.</p>
+</section>
+<section id="tidymodels" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="tidymodels"><span class="header-section-number">1.2</span> Tidymodels</h2>
+<p>R es un lenguaje de programación de acceso libre para la comunidad. Es un lenguaje amigable para estadística y ciencia de datos, que es extensible por medio de paquetes o bibliotecas. <em>Tidyverse</em> (Wickham et al., 2019) es una colección de paquetes, entre los más usados en R para ciencia de datos. <em>Tidymodels</em> (Silge &amp; Kuhn, 2020), nace como una extensión para el modelamiento predictivo dentro de <em>tidyverse</em>.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } 
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./index.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Prefacio</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./chapter1.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Modelamiento en tidymodels con el motor lm.</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -1,0 +1,27 @@
+project:
+  type: book
+
+book:
+  title: "Crop Yield Forecast in tidymodels"
+  author: "Christian Richard Alberto Vásquez velasco"
+  date: "2022/12/14"
+  chapters:
+    - index.qmd
+    - intro.qmd
+    - chapter1.qmd
+    - chapter2.qmd
+    - chapter3.qmd
+  page-navigation: true
+  
+bibliography: references.bib
+
+format:
+  html:
+    theme:
+      light: flatly
+      dark: darkly
+  pdf:
+    documentclass: scrreprt
+    
+editor: visual
+
